@@ -1,4 +1,4 @@
-function [J grad] = nnCostFunction(nn_params, ...
+function [J, grad] = nnCostFunction(nn_params, ...
                                    input_layer_size, ...
                                    hidden_layer_size, ...
                                    num_labels, ...
@@ -62,23 +62,34 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+for i = 1:m
+    x = X(i, :);
+    a1 = [1; x(:)];
+    z2 = Theta1 * a1;
+    a2 = [1; sigmoid(z2)];
+    z3 = Theta2 * a2;
+    a3 = sigmoid(z3);
+    t = zeros(1, num_labels);
+    t(y(i)) = 1;
+    J = J - (t * log(a3) + (1 - t) * log(1 - a3));
+    delta3 = a3 - t';
+    delta2 = (Theta2' * delta3) .* a2 .* (1 - a2);
+    delta2 = delta2(2:end);
+    Theta1_grad = Theta1_grad + delta2 * a1';
+    Theta2_grad = Theta2_grad + delta3 * a2';
+end
+J = J + lambda * (sumsqr(Theta1(:, 2:end)) + sumsqr(Theta2(:, 2:end))) / 2;
+J = J / m;
 
+Theta_10 = zeros(size(Theta1));
+Theta_10(:, 2:end) = Theta1(:, 2:end);
+Theta_20 = zeros(size(Theta2));
+Theta_20(:, 2:end) = Theta2(:, 2:end);
+Theta1_grad = Theta1_grad + lambda * Theta_10;
+Theta2_grad = Theta2_grad + lambda * Theta_20;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Theta1_grad = Theta1_grad / m;
+Theta2_grad = Theta2_grad / m;
 
 % -------------------------------------------------------------
 
