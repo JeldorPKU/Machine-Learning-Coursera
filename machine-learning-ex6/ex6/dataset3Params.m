@@ -23,11 +23,25 @@ sigma = 0.3;
 %        mean(double(predictions ~= yval))
 %
 
-
-
-
-
-
+steps = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30];
+steps = steps(:);
+l = size(steps, 1);
+error = 1e100;
+for i = 1:l
+    for j = 1:l
+        currentC = steps(i);
+        currentSigma = steps(j);
+        model = svmTrain(X, y, currentC, ...
+            @(X, y)gaussianKernel(X, y, currentSigma));
+        prediction = svmPredict(model, Xval);
+        currentError = mean(double(prediction ~= yval));
+        if currentError < error
+            C = currentC;
+            sigma = currentSigma;
+            error = currentError;
+        end
+    end
+end
 
 % =========================================================================
 
