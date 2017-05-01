@@ -40,20 +40,17 @@ Theta_grad = zeros(size(Theta));
 %                     partial derivatives w.r.t. to each element of Theta
 %
 
+h = X * Theta' - Y; % h - num_movies x num_users matrix
+M = R .* h;         % M - num_movies x num_users matrix
+J = (sum(sum(M .^ 2)) + lambda * sum(sum(X .^ 2)) ...
+    + lambda * sum(sum(Theta .^ 2))) / 2;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+for i = 1:num_movies
+    X_grad(i, :) = M(i, :) * Theta + lambda * X(i, :);
+end
+for j = 1:num_users
+    Theta_grad(j, :) = M(:, j)' * X + lambda * Theta(j, :);
+end
 
 % =============================================================
 
